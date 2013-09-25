@@ -9,11 +9,17 @@ public class Prg3 {
 		}
 
 		int n = Integer.parseInt ( args[0] ) ;
-		//only considering multiples of 3 and 5
-		int number_of_three_multiples = n / 3 ;
-		int number_of_five_multiples = n / 5 ;
-		int number_of_fifteen_multiples = n / 15 ;
+		
+		int sum = 0 ;
+		int i ;
 
-		number_of_three_multiples * 
+		for ( i = 3 ; i <= n ; i *= 3 )
+			sum += i ;
+		for ( i = 5 ; i <= n ; i *= 5 )
+			sum += i ;
+		for ( i = 15 ; i <= n ; i *= 15 )
+			sum += i ;
+
+		System.out.println ( sum ) ;
 	}
 }
