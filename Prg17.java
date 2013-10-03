@@ -14,7 +14,13 @@ class Operation {
 	
 	public int priority ( )
 	{
+		if ( x == '(' )
+			return 3 ;
+
 		if ( x =='~' )
+			return 2 ;
+
+		if ( x == 'v' || x == '^' )
 			return 1 ;
 		
 		return 0 ;
@@ -31,7 +37,7 @@ public class Prg17 {
 	
 	static boolean isOperation ( char x )
 	{
-		return ( x == '~' || x == 'v' || x == '&' ) ;
+		return ( x == '~' || x == 'v' || x == '&' || x == '(' || x == ')' ) ;
 	}
 	
 	static boolean isVariable ( char x )
@@ -75,14 +81,29 @@ public class Prg17 {
 			if ( isOperation ( current_char ) )
 			{
 				Operation current_operation = new Operation ( current_char ) ;
-				
-				while ( ! operations.empty() && current_operation.priority() < operations.peek().priority() )
+
+				if ( current_char == ')' )
 				{
-					char last_operation = operations.pop().getOperation() ;
-					polonez [ ++ polonez_length ] = last_operation ;
+					//pop everything until '('
+					while ( operations.peek().getOperation() != '(' ) 
+					{
+						char last_operation = operations.pop().getOperation() ;
+						polonez [ ++ polonez_length ] = last_operation ;
+					}
+					//pop the '('
+					operations.pop();
 				}
-				
-				operations.push( current_operation ) ;
+				else
+				{
+					
+					while ( ! operations.empty() && !( operations.peek().getOperation() == '(') && current_operation.priority() < operations.peek().priority() )
+					{
+						char last_operation = operations.pop().getOperation() ;
+						polonez [ ++ polonez_length ] = last_operation ;
+					}
+					
+					operations.push( current_operation ) ;
+				}
 			}
 			else
 			{
@@ -90,11 +111,14 @@ public class Prg17 {
 				polonez [ polonez_length ] = current_char ;
 				variables.add ( current_char ) ;
 			}
+
 		}
 		
 		//see how many variables we have
 		
 		int variable_count = variables.size() ;
+
+		System.out.println ( variables ) ;
 				
 		while ( ! operations.empty() )
 		{
@@ -116,7 +140,7 @@ public class Prg17 {
 
 		for ( k = 0 ; k < limit ; ++ k )
 		{
-			for ( j = variable_count -1  ; j >= 0 ; -- j )
+			for ( j = 0; j < variable_count ; ++ j )
 				if ( ( k &  (1 << j ) ) > 0 )
 					System.out.printf ( "1 " ) ;
 				else
@@ -125,12 +149,13 @@ public class Prg17 {
 			boolean currentValue = false ;
 
 			for ( i = 0 ; i < polonez_length ; ++ i )
+			{
 				if ( isOperation ( polonez [ i ] ) )
 				{
 					//daca e NOT ne uitam doar la ultimul caracter
 					if ( polonez[i] == '~' )
 					{
-						boolean value = ( k & ( 1 << ( polonez [ i - 1 ] - 'a' ) ) ) > 0 ;
+						boolean value = values.pop() ; //( k & ( 1 << ( polonez [ i - 1 ] - 'a' ) ) ) > 0 ;
 						values.push ( Boolean.valueOf (!value) ) ;
 					}
 					else
@@ -148,6 +173,7 @@ public class Prg17 {
 					boolean value = ( k & ( 1 << ( polonez [ i ] - 'a' ) ) ) > 0 ;
 					values.push ( Boolean.valueOf (value) ) ;
 				}
+			}
 
 			System.out.print ( values.pop() ) ;
 
